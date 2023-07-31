@@ -42,6 +42,7 @@ typedef sint8				int8;
 /*#include "winamp_dsp.h"/*/
 #include <winamp/dsp.h>/**/
 #include <loader/loader/utils.h>
+#include <../wacup_version.h>
 
 
 bool			mInitialized = false;
@@ -270,7 +271,7 @@ void Config(struct winampDSPModule *thisModule) {
 #else
 					L"Cut filter by Avery Lee.", dspHeader.description, L"Darren Owen aka DrO",
 #endif
-					L"2021-2022", TEXT(__DATE__));
+					L"2021-" WACUP_COPYRIGHT, TEXT(__DATE__));
 	AboutMessageBox(thisModule->hwndParent, message, L"Center Cut");
 }
 
