@@ -42,7 +42,6 @@ typedef sint8				int8;
 /*#include "winamp_dsp.h"/*/
 #include <winamp/dsp.h>/**/
 #include <loader/loader/utils.h>
-#include <../wacup_version.h>
 
 
 bool			mInitialized = false;
@@ -112,7 +111,7 @@ void CenterCut_Finish();
 bool CenterCut_Run();
 
 #ifndef _WIN64
-winampDSPHeader dspHeader = { DSP_HDRVER, "Center Cut v1.4.1", GetModule };
+winampDSPHeader dspHeader = { DSP_HDRVER, "Center Cut v1.4.2", GetModule };
 #else
 winampDSPHeader dspHeader = { DSP_HDRVER, TEXT("Center Cut v1.4.2"), GetModule };
 #endif
@@ -263,15 +262,15 @@ void Config(struct winampDSPModule *thisModule) {
 #endif
 
 	wchar_t message[512] = { 0 };
-	StringCchPrintf(message, ARRAYSIZE(message), L"%s\nCopyright © 2004-2007 Moitah "
-					L"(https://www.moitah.net)\n\nWACUP related modifications by %s "
-					L"© %s\n\nBuild date: %s\n\nThis is based on VirtualDub's Center "
+	StringCchPrintf(message, ARRAYSIZE(message), L"%s\nCopyright © 2004-2007 Moitah\n"
+					L"(https://www.moitah.net)\n\nWACUP related modifications by\n%s "
+					L"© 2021-%s\n\nBuild date: %s\n\nThis is based on VirtualDub's\n"
 #ifndef _WIN64
-					L"Cut filter by Avery Lee.", title, L"Darren Owen aka DrO",
+					L"Center Cut filter by Avery Lee.", title,
 #else
-					L"Cut filter by Avery Lee.", dspHeader.description, L"Darren Owen aka DrO",
+					L"Center Cut filter by Avery Lee.", dspHeader.description,
 #endif
-					L"2021-" WACUP_COPYRIGHT, TEXT(__DATE__));
+					WACUP_Author(),WACUP_Copyright(), TEXT(__DATE__));
 	AboutMessageBox(thisModule->hwndParent, message, L"Center Cut");
 }
 
