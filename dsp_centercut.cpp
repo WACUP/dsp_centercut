@@ -111,9 +111,9 @@ void CenterCut_Finish();
 bool CenterCut_Run();
 
 #ifndef _WIN64
-winampDSPHeader dspHeader = { DSP_HDRVER, "Center Cut v1.4.2", GetModule };
+winampDSPHeader dspHeader = { DSP_HDRVER, "Center Cut v1.4.3", GetModule };
 #else
-winampDSPHeader dspHeader = { DSP_HDRVER, TEXT("Center Cut v1.4.2"), GetModule };
+winampDSPHeader dspHeader = { DSP_HDRVER, TEXT("Center Cut v1.4.3"), GetModule };
 #endif
 
 winampDSPModule modSide = {
@@ -425,20 +425,15 @@ void ConvertSamples(int type, uint8 *sampB, double *sampD, int sampleCount, int 
 	const double SampleMin = -2147483648.0;
 	const double SampleMax = 2147483647.0;
 
-	int bytesPerSample, shiftCount;
-	sint32 xor;
-	uint8 *max;
-
-	bytesPerSample = (bitsPerSample + 7) / 8;
-	shiftCount = (4 - bytesPerSample) * 8;
-	xor = (bytesPerSample == 1) ? (1 << 31) : 0;
-	max = sampB + (sampleCount * bytesPerSample * chanCount);
+	const int bytesPerSample = (bitsPerSample + 7) / 8;
+	const int shiftCount = (4 - bytesPerSample) * 8;
+	const sint32 _xor = (bytesPerSample == 1) ? (1 << 31) : 0;
+	const uint8* max = sampB + (sampleCount * bytesPerSample * chanCount);
 
 	if (type == BYTES_TO_DOUBLE) {
-		sint32 tempI;
 
 		while (sampB < max) {
-			tempI = (*((sint32*)sampB) << shiftCount) ^ xor;
+			const sint32 tempI = (*((sint32*)sampB) << shiftCount) ^ _xor;
 			*sampD = (double)tempI * SampleScale;
 
 			sampB += bytesPerSample;
@@ -446,12 +441,9 @@ void ConvertSamples(int type, uint8 *sampB, double *sampD, int sampleCount, int 
 		}
 	}
 	else {
-		uint8 *maxw = max - 3;
-		double tempD;
-		uint32 tempI;
-
+		const uint8 *maxw = max - 3;
 		while (sampB < max) {
-			tempD = *sampD * SampleScaleInv;
+			double tempD = *sampD * SampleScaleInv;
 			if (tempD > 0.0) {
 				if (tempD > SampleMax) {
 					tempD = SampleMax;
@@ -464,7 +456,8 @@ void ConvertSamples(int type, uint8 *sampB, double *sampD, int sampleCount, int 
 				}
 				tempD -= 0.5;
 			}
-			tempI = (uint32)((sint32)tempD ^ xor) >> shiftCount;
+
+			uint32 tempI = (uint32)((sint32)tempD ^ _xor) >> shiftCount;
 
 			if (sampB < maxw) {
 				*((uint32*)sampB) = tempI;
