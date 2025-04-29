@@ -42,6 +42,8 @@ typedef sint8				int8;
 /*#include "winamp_dsp.h"/*/
 #include <winamp/dsp.h>/**/
 #include <loader/loader/utils.h>
+#include <loader/hook/squash.h>
+#include "resource.h"
 
 
 bool			mInitialized = false;
@@ -111,9 +113,9 @@ void CenterCut_Finish();
 bool CenterCut_Run();
 
 #ifndef _WIN64
-winampDSPHeader dspHeader = { DSP_HDRVER, "Center Cut v1.4.3", GetModule };
+winampDSPHeader dspHeader = { DSP_HDRVER, "Center Cut v1.4.4", GetModule };
 #else
-winampDSPHeader dspHeader = { DSP_HDRVER, TEXT("Center Cut v1.4.3"), GetModule };
+winampDSPHeader dspHeader = { DSP_HDRVER, TEXT("Center Cut v1.4.4"), GetModule };
 #endif
 
 winampDSPModule modSide = {
@@ -256,21 +258,18 @@ void Quit_Other(struct winampDSPModule *thisModule) {
 }
 
 void Config(struct winampDSPModule *thisModule) {
-#ifndef _WIN64
-	wchar_t title[128] = { 0 };
-	StringCchPrintf(title, ARRAYSIZE(title), L"%hs", dspHeader.description);
-#endif
+	// TODO localise
+	const unsigned char* output = DecompressResourceText(thisModule->hDllInstance,
+									 thisModule->hDllInstance, IDR_ABOUT_TEXT_GZ);
 
-	wchar_t message[512] = { 0 };
-	StringCchPrintf(message, ARRAYSIZE(message), L"%s\nCopyright © 2004-2007 Moitah\n"
-					L"(https://www.moitah.net)\n\nWACUP related modifications by\n%s "
-					L"© 2021-%s\n\nBuild date: %s\n\nThis is based on VirtualDub's\n"
+	wchar_t message[512]/* = { 0 }*/;
+	PrintfCch(message, ARRAYSIZE(message), (LPCWSTR)output
 #ifndef _WIN64
-					L"Center Cut filter by Avery Lee.", title,
+			  , ConvertANSI(dspHeader.description, -1, CP_ACP, NULL, 0),
 #else
-					L"Center Cut filter by Avery Lee.", dspHeader.description,
+			  , dspHeader.description,
 #endif
-					WACUP_Author(),WACUP_Copyright(), TEXT(__DATE__));
+			  WACUP_Author(),WACUP_Copyright(), TEXT(__DATE__));
 	AboutMessageBox(thisModule->hwndParent, message, L"Center Cut");
 }
 
