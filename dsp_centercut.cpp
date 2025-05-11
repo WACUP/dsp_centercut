@@ -214,11 +214,9 @@ BOOL WINAPI DllMain(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lpReserved) {
 	return TRUE;
 }
 
-extern "C" {
-	// This is the only exported symbol
-	__declspec( dllexport ) winampDSPHeader *winampDSPGetHeader2() {
-		return &dspHeader;
-	}
+// This is the only exported symbol
+extern "C" __declspec( dllexport ) winampDSPHeader *winampDSPGetHeader2(DSP_GET_HEADER_PARAMS) {
+	return &dspHeader;
 }
 
 winampDSPModule *GetModule(int which) {
@@ -265,12 +263,14 @@ void Config(struct winampDSPModule *thisModule) {
 	wchar_t message[512]/* = { 0 }*/;
 	PrintfCch(message, ARRAYSIZE(message), (LPCWSTR)output
 #ifndef _WIN64
-			  , ConvertANSI(dspHeader.description, -1, CP_ACP, NULL, 0),
+			  , ConvertANSI(dspHeader.description, -1, CP_ACP, NULL, 0, NULL),
 #else
 			  , dspHeader.description,
 #endif
 			  WACUP_Author(),WACUP_Copyright(), TEXT(__DATE__));
 	AboutMessageBox(thisModule->hwndParent, message, L"Center Cut");
+
+	SafeFree((void*)output);
 }
 
 /*void UnloadDLL() {
